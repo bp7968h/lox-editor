@@ -30,6 +30,6 @@ const Button: React.FC<ButtonProps> = ({ onClick, label, bg_color, disabled = fa
             {label} {children}
         </button>
     )
-}
+};
 
 export default Button;

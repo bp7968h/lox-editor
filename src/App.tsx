@@ -1,8 +1,12 @@
+import Editor from "./components/Editor"
+import ToolBar from "./components/ToolBar"
+
 function App() {
   return (
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+    <>
+      <ToolBar />
+      <Editor />
+    </>
   )
 }
 
