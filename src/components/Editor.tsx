@@ -2,7 +2,7 @@ import React from "react";
 
 const Editor: React.FC = () => {
     return (
-        <div className="mt-2 mx-2 bg-slate-500">
+        <div className="mt-2 mx-2 bg-code font-mono">
             This is Editor
         </div>
     )
