@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        code_mono: ['JetBrains Mono', 'monospace'],
+      },
       colors: {
         destructive: 'hsl(0, 62.8%, 30.6%)',
         group: 'hsl(346.8 77.2% 49.8%)',
