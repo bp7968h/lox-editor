@@ -10,8 +10,8 @@ interface ButtonProps {
 }
 
 const Button: React.FC<ButtonProps> = ({ onClick, label, bg_color, disabled = false, className = "", children }) => {
-    const base_classes: string = `inline-flex items-center justify-center text-sm font-medium font-mono rounded`;
-    const size_classes: string = `px-2 py-1 text-sm font-medium sm:px-4 sm:py-2 sm:text-base md:h-9 md:px-4 md:py-2 md:text-lg`;
+    const base_classes: string = `inline-flex items-center justify-center text-sm font-medium rounded`;
+    const size_classes: string = `px-3 py-2 text-sm font-medium sm:px-4 sm:py-2 sm:text-base md:h-9 md:text-lg`;
     const color_classes = {
         group: 'bg-group text-white hover:bg-group/90',
         blue: 'bg-blue-500 text-white hover:bg-blue-600',
