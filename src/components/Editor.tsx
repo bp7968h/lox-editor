@@ -7,6 +7,43 @@ const Editor: React.FC = () => {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
         const { key } = e;
         console.log(key);
+        switch(key) {
+            case "Enter":
+                setLines((prev) => [...prev, ""]);
+                break;
+            case "Backspace":
+                e.preventDefault();
+                handleBackspace();
+                break;
+            default:
+                console.log(e);
+                break;
+        }
+    }
+
+    const handleBackspace = () => {
+        const newLines = [...lines];
+        if (newLines.length == 1) {
+            if (newLines[0].length == 0) {
+                return;
+            } else {
+                const currentLine = newLines[newLines.length - 1];
+                newLines[newLines.length - 1] = currentLine.substring(0, currentLine.length -1);
+                setLines(newLines);
+                return;
+            }
+        } else {
+            const currentLine = newLines[newLines.length - 1];
+            if (currentLine.length == 0) {
+                newLines.pop();
+                return;
+            } else {
+                newLines[newLines.length - 1] = currentLine.substring(0, currentLine.length -1);
+                console.log(newLines[newLines.length - 1]);
+                setLines(newLines);
+            }
+            return;
+        }
     }
 
     return (
