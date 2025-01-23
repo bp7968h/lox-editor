@@ -7,7 +7,7 @@ export interface Line {
     code: string,
 }
 
-interface Cursor {
+export interface Cursor {
     line: number,
     column: number,
 }
@@ -108,7 +108,10 @@ const Editor: React.FC = () => {
                     <div key={line.id} className="flex flex-row">
                         <LineNumber line={line.id} />
                         <div className="whitespace-pre text-white h-6 pl-2">
-                            <LineCode code={line.code} />
+                            <LineCode 
+                                code={line.code} 
+                                cursorPosition={line.id === cursorPosition.line ? cursorPosition.column : undefined}
+                            />
                         </div>
                     </div> 
                 ))}
