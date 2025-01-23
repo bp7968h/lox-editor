@@ -1,0 +1,16 @@
+import React from "react";
+import { Line } from "./Editor";
+
+type LineNumberProp = {line: Line['id']};
+
+const LineNumber: React.FC<LineNumberProp> = ({line}) => {
+    return (
+        <div className="bg-inherit w-auto text-right px-1 border-r-4 border-neutral-900">
+              <div key={line} className="h-6">
+                {line.toString()}
+              </div>
+        </div>
+    )
+};
+
+export default LineNumber;
