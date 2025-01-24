@@ -1,9 +1,9 @@
 import React from "react";
-import { Line } from "./Editor";
+import { Line } from "../../hooks/useEditorState";
 
 type LineCodeProps = {
     code: Line['code'],
-    cursorPosition?: number,
+    cursorPosition: number | undefined,
 }
 
 const LineCode: React.FC<LineCodeProps> = ({ code, cursorPosition }) => {
@@ -18,7 +18,7 @@ const LineCode: React.FC<LineCodeProps> = ({ code, cursorPosition }) => {
     if (code === '' || cursorPosition === 0) {
         return (
           <div className="relative">
-            <span className="bg-white w-0.5 text-black cursor-bar">|</span>
+            <span className="absolute w-0.8 h-full bg-white animate-pulse">|</span>
           </div>
         );
     }

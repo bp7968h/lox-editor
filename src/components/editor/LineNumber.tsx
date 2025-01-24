@@ -1,5 +1,5 @@
 import React from "react";
-import { Line } from "./Editor";
+import { Line } from "../../hooks/useEditorState";
 
 type LineNumberProp = {line: Line['id']};
 
