@@ -22,7 +22,6 @@ const useEditorState = () => {
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         event.preventDefault();
-        console.log(event);
         const currentLineIndex = cursorPosition.line;
         const currentLine = lines[currentLineIndex - 1];
 
@@ -81,12 +80,43 @@ const useEditorState = () => {
                 break;
             // TODO!
             case "ArrowLeft":
+                if (currentLineIndex === 1 && cursorPosition.column === 0) {
+                    return;
+                }
+                if (currentLineIndex > 1 && cursorPosition.column === 0) {
+                    const prevLineLen = lines[currentLineIndex - 2].code.length;
+                    setCursorPosition((prev) => ({
+                        line: prev.line - 1,
+                        column: prevLineLen - 1,
+                    }));
+                    return;
+                }
+                setCursorPosition((prev) => ({
+                    ...prev,
+                    column: prev.column - 1,
+                }));
                 break;
             case "ArrowRight":
+                // if ()
+                setCursorPosition((prev) => ({
+                    ...prev,
+                    column: prev.column + 1,
+                }));
                 break;
             case "ArrowUp":
+                setCursorPosition((prev) => ({
+                    ...prev,
+                    line: prev.line - 1,
+                }));
                 break;
             case "ArrowDown":
+                if (lines.length === currentLineIndex) {
+                    return;
+                }
+                setCursorPosition((prev) => ({
+                    ...prev,
+                    line: prev.line + 1,
+                }));
                 break;
             default:
                 if (event.key.length === 1) {

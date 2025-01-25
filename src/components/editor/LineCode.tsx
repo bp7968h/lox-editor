@@ -3,12 +3,12 @@ import { Line } from "../../hooks/useEditorState";
 
 type LineCodeProps = {
     code: Line['code'],
-    cursorPosition: number | undefined,
+    cursorCol: number | undefined,
     status: boolean,
 }
 
-const LineCode: React.FC<LineCodeProps> = ({ code, cursorPosition, status }) => {
-    if (cursorPosition === undefined) {
+const LineCode: React.FC<LineCodeProps> = ({ code, cursorCol, status }) => {
+    if (cursorCol === undefined) {
         return (
             <span>
                 {code}
@@ -16,7 +16,7 @@ const LineCode: React.FC<LineCodeProps> = ({ code, cursorPosition, status }) => 
         );
     }
 
-    if (code === '' || cursorPosition === 0) {
+    if (code === '' && cursorCol === 0) {
         return (
           <div className="relative">
             { status && <span className="absolute w-0.8 h-full bg-white animate-pulse">|</span>}
@@ -24,14 +24,14 @@ const LineCode: React.FC<LineCodeProps> = ({ code, cursorPosition, status }) => 
         );
     }
 
-    const beforeCursor = code.slice(0, cursorPosition);
-    const afterCursor = code.slice(cursorPosition);
+    const beforeCursor = code.slice(0, cursorCol);
+    const afterCursor = code.slice(cursorCol);
     
     return (
         <div className="relative">
           <span>{beforeCursor}</span>
           {status && 
-            cursorPosition !== undefined && (
+            cursorCol !== undefined && (
               <span className="absolute w-0.5 h-full bg-white animate-pulse"></span>
             )
           }

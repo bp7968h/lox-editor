@@ -30,18 +30,17 @@ const Editor: React.FC = () => {
                 ref={editorRef}
                 tabIndex={0}
                 onKeyDown={handleKeyDown}
-                onFocus={() => console.log("foc")}
-                onBlur={() => console.log("blur")}
                 className="bg-inherit text-white grow px-2 py-0 focus:outline-none"
             >
-                {lines.map((line) => (
-                    <div key={line.id} className="flex flex-row">
+                {lines.map((line) => {
+                    return (
+                        <div key={line.id} className="flex flex-row">
                         <LineNumber line={line.id} />
                         <div className="whitespace-pre text-white h-6 pl-2">
                             <LineCode 
                                 code={line.code} 
                                 status={isActive}
-                                cursorPosition={
+                                cursorCol={
                                     line.id === cursorPosition.line 
                                     ? cursorPosition.column 
                                     : undefined
@@ -49,7 +48,8 @@ const Editor: React.FC = () => {
                             />
                         </div>
                     </div> 
-                ))}
+                    )
+                })}
             </div>
         </div>
     )
