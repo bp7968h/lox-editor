@@ -27,17 +27,10 @@ const useEditorState = () => {
 
         switch(event.key) {
             case "Enter":
-                setLines((prev) => {
-                    const updatedLines = prev.map((line) => 
-                        line.id === currentLineIndex
-                            ? { ...line, code: line.code.concat("\n") }
-                            : line
-                    );
-                    return [
-                        ...updatedLines,
-                        { id: currentLineIndex + 1, code: "" },
-                    ];
-                });
+                setLines((prev) => [
+                    ...prev,
+                    { id: currentLineIndex + 1, code: "" },
+                ]);
 
                 setCursorPosition({
                     line: currentLineIndex + 1,
@@ -50,12 +43,7 @@ const useEditorState = () => {
                         return;
                     } else {
                         setLines((prev) => {
-                            const updatedLines = prev.map((line) => 
-                                line.id === currentLineIndex - 1
-                                    ? { ...line, code: line.code.trimEnd() }
-                                    : line
-                            );
-                            const newLines = updatedLines.slice(0, -1);
+                            const newLines = prev.slice(0, -1);
                             const updatedCol = newLines[newLines.length - 1].code.length;
 
                             setCursorPosition({
@@ -78,7 +66,6 @@ const useEditorState = () => {
                     column: prev.column - 1,
                 }));
                 break;
-            // TODO!
             case "ArrowLeft":
                 if (currentLineIndex === 1 && cursorPosition.column === 0) {
                     return;
@@ -87,7 +74,7 @@ const useEditorState = () => {
                     const prevLineLen = lines[currentLineIndex - 2].code.length;
                     setCursorPosition((prev) => ({
                         line: prev.line - 1,
-                        column: prevLineLen - 1,
+                        column: prevLineLen,
                     }));
                     return;
                 }
@@ -97,13 +84,37 @@ const useEditorState = () => {
                 }));
                 break;
             case "ArrowRight":
-                // if ()
+                if (cursorPosition.column === currentLine.code.length) {
+                    if (currentLineIndex === lines.length) {
+                        return;
+                    }
+                    if (currentLineIndex < lines.length) {
+                        setCursorPosition((prev) => ({
+                            line: prev.line + 1,
+                            column: 0,
+                        }));
+                        return;
+                    }
+                }
                 setCursorPosition((prev) => ({
                     ...prev,
                     column: prev.column + 1,
                 }));
                 break;
             case "ArrowUp":
+                if (currentLineIndex === 1) {
+                    return;
+                }
+                if (currentLineIndex > 1) {
+                    const prevLineLen = lines[currentLineIndex - 2].code.length;
+                    if ( cursorPosition.column > prevLineLen) {
+                        setCursorPosition((prev) => ({
+                            column: prevLineLen,
+                            line: prev.line - 1,
+                        }));
+                        return
+                    }
+                }
                 setCursorPosition((prev) => ({
                     ...prev,
                     line: prev.line - 1,
@@ -112,6 +123,16 @@ const useEditorState = () => {
             case "ArrowDown":
                 if (lines.length === currentLineIndex) {
                     return;
+                }
+                if (currentLineIndex < lines.length) {
+                    const nextLineLen = lines[currentLineIndex].code.length;
+                    if (cursorPosition.column > nextLineLen) {
+                        setCursorPosition((prev) => ({
+                            column: nextLineLen,
+                            line: prev.line + 1,
+                        }));
+                        return
+                    }
                 }
                 setCursorPosition((prev) => ({
                     ...prev,
