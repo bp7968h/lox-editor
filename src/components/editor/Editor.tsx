@@ -2,9 +2,12 @@ import React, {useState,useEffect, useRef} from "react";
 import LineNumber from "./LineNumber";
 import LineCode from "./LineCode";
 import useEditorState from "../../hooks/useEditorState";
+import { WasmToken } from "lox_rc";
 
-const Editor: React.FC = () => {
-    const { lines, cursorPosition, handleKeyDown } = useEditorState();
+export type tokenizeFn = {tokenizer:(source: string) => WasmToken[]};
+
+const Editor: React.FC<tokenizeFn> = ( {tokenizer} ) => {
+    const { lines, cursorPosition, handleKeyDown } = useEditorState(tokenizer);
     const [isActive, setIsActive] = useState(false);
     const editorRef = useRef<HTMLDivElement>(null);
 
