@@ -163,7 +163,13 @@ impl<'a> Scanner<'a> {
         rest: &str,
         token_type: TokenType,
     ) -> Token {
-        let slice = &self.source[self.start + start..self.start + start + length];
+        println!("{} {}", start, length);
+        let start_idx = self.start + start;
+        let end_idx = self.start + start + length;
+        if self.source.len() < end_idx {
+            return self.make_token(TokenType::IDENTIFIER);
+        }
+        let slice = &self.source[start_idx..end_idx];
         if let Ok(slice_str) = std::str::from_utf8(slice) {
             if self.current - self.start == start + length && slice_str == rest {
                 return self.make_token(token_type);
