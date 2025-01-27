@@ -13,7 +13,7 @@ const ToolBar: React.FC = () => {
                 <DropDown />
             </div>
             <div className="w-1/2 md:w-1/3 md:text-right flex items-center justify-end space-x-4">
-                <Button onClick={() => console.log("share")} label="Share" bg_color="destructive" />
+                <Button onClick={() => console.log("share")} label="Share" bg_color="destructive" disabled={true} />
                 <Button onClick={() => console.log("run")} label="Run" bg_color="group" />
             </div>
         </nav>

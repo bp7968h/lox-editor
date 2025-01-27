@@ -41,7 +41,8 @@ const Editor: React.FC<tokenizeFn> = ( {tokenizer} ) => {
                         <LineNumber line={line.id} />
                         <div className="whitespace-pre text-white h-6 pl-2">
                             <LineCode 
-                                code={line.code} 
+                                code={line.code}
+                                tokens={line.tokens}
                                 status={isActive}
                                 cursorCol={
                                     line.id === cursorPosition.line 

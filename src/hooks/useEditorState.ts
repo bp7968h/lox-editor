@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { WasmToken } from "lox_rc";
-import { tokenizeFn } from "../components/editor/Editor";
+// import { tokenizeFn } from "../components/editor/Editor";
 
 export interface Line {
     id: number,
@@ -20,11 +20,11 @@ const updateLineContent = (
     tokenizer: (source: string) => WasmToken[]
   ): Line[] => {
     const newTokens = tokenizer(newCode);
-    newTokens.forEach((t) => {
-        console.log(t.token_type);
-        console.log(t.lexeme);
-        console.log(t.line);    
-    })
+    // newTokens.forEach((t) => {
+    //     console.log(t.token_type);
+    //     console.log(t.lexeme);
+    //     console.log(t.line);    
+    // })
     return lines.map((l) =>
       l.id === lineId ? { ...l, code: newCode, tokens: newTokens } : l
     );
