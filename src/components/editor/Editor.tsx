@@ -1,4 +1,4 @@
-import React, {useState,useEffect, useRef, forwardRef, useImperativeHandle} from "react";
+import {useState,useEffect, useRef, forwardRef, useImperativeHandle} from "react";
 import LineNumber from "./LineNumber";
 import LineCode from "./LineCode";
 import useEditorState from "../../hooks/useEditorState";
@@ -10,12 +10,13 @@ type EditorProps = {
 
 export interface EditorHandle {
     getCode: () => string;
+    setCode: (newCode: string) => void;
 }
 
 const Editor = forwardRef<EditorHandle, EditorProps>((props, ref) => {
     const { tokenizer } = props;
 
-    const { lines, cursorPosition, handleKeyDown } = useEditorState(tokenizer);
+    const { lines, cursorPosition, handleKeyDown, setLines, setCursorPosition } = useEditorState(tokenizer);
     const [isActive, setIsActive] = useState(false);
     const editorRef = useRef<HTMLDivElement>(null);
 
@@ -36,8 +37,23 @@ const Editor = forwardRef<EditorHandle, EditorProps>((props, ref) => {
         getCode() {
           return lines.map(line => line.code).join("\n");
         },
-        getToken() {
-            return lines.flatMap(line => line.tokens);
+        setCode(exampleCode: string) {
+            const rawLines = exampleCode.split("\n");
+            const newLines = rawLines.map((text, idx) => {
+                const tokens = tokenizer(text);
+                return {
+                    id: idx + 1,
+                    code: text,
+                    tokens
+                  };
+            });
+
+            setLines(newLines);
+            const lastLineIndex = newLines.length;
+            setCursorPosition({
+                line: lastLineIndex + 1,
+                column: 0,
+            });
         }
     }));
 

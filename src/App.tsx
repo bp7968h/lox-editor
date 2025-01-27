@@ -16,9 +16,16 @@ function App() {
     console.log("Running code:\n", code);
   }
 
+  const handleLoadExample = (exampleCode: string) => {
+    if (!editorRunRef.current) {
+      return;
+    }
+    editorRunRef.current.setCode(exampleCode);
+  }
+
   return (
     <div className="min-h-screen bg-neutral-900 text-white flex flex-col font-mono">
-      <ToolBar onRun={handleCodeRun} />
+      <ToolBar onRun={handleCodeRun} onLoad={handleLoadExample} />
       {!tokenizeState || !tokenizeFn 
         ? <div>Loading WASM...</div>
         : <Editor ref={editorRunRef} tokenizer={tokenizeFn} />

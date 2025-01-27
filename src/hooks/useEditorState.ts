@@ -288,6 +288,8 @@ const useEditorState = (tokenizer: (source: string) => WasmToken[] ) => {
         lines,
         cursorPosition,
         handleKeyDown,
+        setLines,
+        setCursorPosition,
     };
 }
 
