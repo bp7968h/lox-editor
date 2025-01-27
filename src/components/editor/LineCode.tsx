@@ -30,7 +30,7 @@ const ElementFromToken = (token: WasmToken, index: number): ReactNode | null => 
     }
     case 'string': {
       return (
-        <span className="text-code_green">
+        <span key={`${token.lexeme}-${index}`} className="text-code_green">
           "{token.lexeme}"
         </span>
       );
@@ -58,11 +58,11 @@ const ElementFromToken = (token: WasmToken, index: number): ReactNode | null => 
     case "this":
     case "var":
     case "while": {
-      return <span className="text-code_purple">{token.lexeme}</span>;
+      return <span key={`${token.lexeme}-${index}`} className="text-code_purple">{token.lexeme}</span>;
     }
     default: {
       return (
-        <span className="text-white">
+        <span key={`${token.lexeme}-${index}`} className="text-white">
           {token.lexeme}
         </span>
       );

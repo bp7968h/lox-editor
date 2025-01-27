@@ -1,12 +1,20 @@
-import React, {useState,useEffect, useRef} from "react";
+import React, {useState,useEffect, useRef, forwardRef, useImperativeHandle} from "react";
 import LineNumber from "./LineNumber";
 import LineCode from "./LineCode";
 import useEditorState from "../../hooks/useEditorState";
 import { WasmToken } from "lox_rc";
 
-export type tokenizeFn = {tokenizer:(source: string) => WasmToken[]};
+type EditorProps = {
+    tokenizer: (source: string) => WasmToken[];
+};
 
-const Editor: React.FC<tokenizeFn> = ( {tokenizer} ) => {
+export interface EditorHandle {
+    getCode: () => string;
+}
+
+const Editor = forwardRef<EditorHandle, EditorProps>((props, ref) => {
+    const { tokenizer } = props;
+
     const { lines, cursorPosition, handleKeyDown } = useEditorState(tokenizer);
     const [isActive, setIsActive] = useState(false);
     const editorRef = useRef<HTMLDivElement>(null);
@@ -23,6 +31,15 @@ const Editor: React.FC<tokenizeFn> = ( {tokenizer} ) => {
           document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    useImperativeHandle(ref, () => ({
+        getCode() {
+          return lines.map(line => line.code).join("\n");
+        },
+        getToken() {
+            return lines.flatMap(line => line.tokens);
+        }
+    }));
 
     return (
         <div 
@@ -57,6 +74,6 @@ const Editor: React.FC<tokenizeFn> = ( {tokenizer} ) => {
             </div>
         </div>
     )
-};
+});
 
 export default Editor;

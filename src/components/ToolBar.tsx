@@ -2,7 +2,7 @@ import React from "react";
 import Button from "./shared/Button";
 import DropDown from "./shared/DropDown";
 
-const ToolBar: React.FC = () => {
+const ToolBar: React.FC<{onRun: () => void}> = ({onRun}) => {
     return (
         <nav className="py-2 px-6 flex flex-wrap">
             <div className="pb-2 md:pb-0 w-full md:w-1/3 flex md:space-x-8 justify-between md:justify-normal">
@@ -14,7 +14,7 @@ const ToolBar: React.FC = () => {
             </div>
             <div className="w-1/2 md:w-1/3 md:text-right flex items-center justify-end space-x-4">
                 <Button onClick={() => console.log("share")} label="Share" bg_color="destructive" disabled={true} />
-                <Button onClick={() => console.log("run")} label="Run" bg_color="group" />
+                <Button onClick={() => onRun()} label="Run" bg_color="group" />
             </div>
         </nav>
     )
