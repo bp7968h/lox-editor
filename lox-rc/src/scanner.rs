@@ -33,6 +33,9 @@ impl<'a> Scanner<'a> {
 
     pub fn scan_token(&mut self) -> Token {
         self.skip_whitespace();
+        if let Some(t) = self.skip_whitespace() {
+            return t;
+        }
         self.start = self.current;
 
         if self.is_at_end() {
@@ -92,16 +95,30 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    fn skip_whitespace(&mut self) {
+    fn skip_whitespace(&mut self) -> Option<Token> {
         loop {
             let character = self.peek();
             match character {
                 ' ' | '\r' | '\t' => {
                     self.advance();
+                    return Some(
+                        Token { 
+                            token_type: TokenType::WHITESPACE, 
+                            lexeme: character.to_string(), 
+                            line: self.line 
+                        }
+                    )
                 }
                 '\n' => {
                     self.line += 1;
                     self.advance();
+                    return Some(
+                        Token { 
+                            token_type: TokenType::NEWLINE, 
+                            lexeme: character.to_string(), 
+                            line: self.line 
+                        }
+                    )
                 }
                 '/' => {
                     if self.peek_next() == '/' {
@@ -109,9 +126,9 @@ impl<'a> Scanner<'a> {
                             self.advance();
                         }
                     }
-                    return;
+                    return None;
                 }
-                _ => return,
+                _ => return None,
             }
         }
     }
@@ -163,7 +180,7 @@ impl<'a> Scanner<'a> {
         rest: &str,
         token_type: TokenType,
     ) -> Token {
-        println!("{} {}", start, length);
+        // println!("{} {}", start, length);
         let start_idx = self.start + start;
         let end_idx = self.start + start + length;
         if self.source.len() < end_idx {

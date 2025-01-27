@@ -231,13 +231,12 @@ impl<'scanner, 'chunk> Compiler<'scanner, 'chunk> {
 
     fn advance(&mut self) {
         self.previous = self.current.take();
-        // println!(
-        //    "Advance Fn - Prev {:?}, Curr {:?}",
-        //    self.previous, self.current
-        // );
 
         loop {
             let scanned_token = self.scanner.scan_token();
+            if scanned_token.token_type == TokenType::WHITESPACE || scanned_token.token_type == TokenType::NEWLINE {
+                continue;
+            }
 
             match scanned_token.token_type {
                 TokenType::ERROR => {
@@ -734,6 +733,7 @@ impl<'scanner, 'chunk> Compiler<'scanner, 'chunk> {
             TokenType::WHILE => ParseRule::default(),
             TokenType::ERROR => ParseRule::default(),
             TokenType::EOF => ParseRule::default(),
+            _ => ParseRule::default(),
         }
     }
 }

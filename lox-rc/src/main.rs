@@ -10,6 +10,7 @@ fn main() {
             Ok(content) => {
                 let mut vm = VM::new();
                 if env::var("DEBUG").is_ok() {
+                    println!("Running on DEBUG mode!");
                     vm.set_debug(true);
                 }
 
