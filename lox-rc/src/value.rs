@@ -71,7 +71,9 @@ impl Add for ValueType {
         match (self, rhs) {
             (ValueType::Number(a), ValueType::Number(b)) => Ok(ValueType::Number(a + b)),
             (ValueType::Obj(a), ValueType::Obj(b)) => Ok(ValueType::Obj((a + b)?)),
-            _ => Err(InterpretError::RuntimeError),
+            _ => Err(InterpretError::RuntimeError(
+                "Operands must be two numbers or two strings.".to_string()
+            )),
         }
     }
 }
@@ -82,7 +84,9 @@ impl Sub for ValueType {
     fn sub(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (ValueType::Number(a), ValueType::Number(b)) => Ok(ValueType::Number(a - b)),
-            _ => Err(InterpretError::RuntimeError),
+            _ => Err(InterpretError::RuntimeError(
+                "Operands must be numbers.".to_string()
+            )),
         }
     }
 }
@@ -93,7 +97,9 @@ impl Mul for ValueType {
     fn mul(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (ValueType::Number(a), ValueType::Number(b)) => Ok(ValueType::Number(a * b)),
-            _ => Err(InterpretError::RuntimeError),
+            _ => Err(InterpretError::RuntimeError(
+                "Operands must be numbers.".to_string()
+            )),
         }
     }
 }
@@ -104,7 +110,9 @@ impl Div for ValueType {
     fn div(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (ValueType::Number(a), ValueType::Number(b)) => Ok(ValueType::Number(a / b)),
-            _ => Err(InterpretError::RuntimeError),
+            _ => Err(InterpretError::RuntimeError(
+                "Operands must be numbers.".to_string()
+            )),
         }
     }
 }

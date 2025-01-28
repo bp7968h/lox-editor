@@ -18,6 +18,8 @@ pub struct Compiler<'scanner, 'chunk> {
     had_error: bool,
     panic_mode: bool,
     debug: bool,
+    errors: Vec<String>,
+    wasm_mode: bool
 }
 
 impl<'scanner, 'chunk> Compiler<'scanner, 'chunk> {
@@ -30,15 +32,28 @@ impl<'scanner, 'chunk> Compiler<'scanner, 'chunk> {
             panic_mode: false,
             debug: false,
             local_track: LocalTracking::default(),
+            errors: Vec::new(),
+            wasm_mode: false,
             chunk,
         }
+    }
+
+    pub fn get_errors(self) -> Option<Vec<String>> {
+        if self.wasm_mode {
+            return Some(self.errors);
+        }
+        None
+    }
+
+    pub fn set_wasm_mode(&mut self, v: bool) {
+        self.wasm_mode = v;
     }
 
     fn synchronize(&mut self) {
         self.panic_mode = false;
 
         loop {
-            if let Some(curr_token) = self.current.take() {
+            if let Some(curr_token) = self.current.clone() {
                 if curr_token.token_type != TokenType::EOF {
                     if let Some(prev_token) = self.previous.as_ref() {
                         if prev_token.token_type == TokenType::SEMICOLON {
@@ -57,9 +72,12 @@ impl<'scanner, 'chunk> Compiler<'scanner, 'chunk> {
                         | TokenType::RETURN => break,
                         _ => (),
                     }
+
+                    self.advance();
+                } else {
+                    break;
                 }
             }
-            self.advance();
         }
     }
 
@@ -234,6 +252,7 @@ impl<'scanner, 'chunk> Compiler<'scanner, 'chunk> {
 
         loop {
             let scanned_token = self.scanner.scan_token();
+            // println!("{:?}", scanned_token);
 
             match scanned_token.token_type {
                 TokenType::WHITESPACE | TokenType::NEWLINE |
@@ -656,15 +675,23 @@ impl<'scanner, 'chunk> Compiler<'scanner, 'chunk> {
         }
 
         self.panic_mode = true;
-        eprint!("[line {} => Error ", token.line);
+
+        let mut full_err_message = format!("[line {} => Error ", token.line - 2);
 
         match token.token_type {
-            TokenType::EOF => eprint!("at end"),
+            TokenType::EOF => full_err_message.push_str("at end] "),
             TokenType::ERROR => (),
-            _ => eprint!("at {}", token.lexeme),
+            _ => full_err_message.push_str(&format!("at {}] ", token.lexeme)),
         }
 
-        println!(": {}", msg);
+        full_err_message.push_str(msg);
+
+        if self.wasm_mode {
+            self.errors.push(full_err_message);
+        } else {
+            eprintln!("{}", full_err_message);
+        }
+
         self.had_error = true;
     }
 

@@ -17,8 +17,14 @@ fn main() {
                 match vm.interpret(&content) {
                     Ok(_) => (),
                     Err(e) => match e {
-                        InterpretError::CompileError => process::exit(65),
-                        InterpretError::RuntimeError => process::exit(70),
+                        InterpretError::CompileError(s) => {
+                            eprintln!("{}", s);
+                            process::exit(65)
+                        },
+                        InterpretError::RuntimeError(s) => {
+                            eprintln!("{}", s);
+                            process::exit(70)
+                        },
                     },
                 }
             }

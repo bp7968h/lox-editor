@@ -11,6 +11,8 @@ pub struct VM {
     debug: bool,
     stack: Vec<ValueType>,
     globals: HashMap<String, ValueType>,
+    output: Vec<String>,
+    wasm_mode: bool,
 }
 
 impl Default for VM {
@@ -27,6 +29,8 @@ impl VM {
             debug: false,
             stack: Vec::new(),
             globals: HashMap::new(),
+            output: Vec::new(),
+            wasm_mode: false,
         }
     }
 
@@ -34,14 +38,34 @@ impl VM {
         self.debug = state
     }
 
+    pub fn set_wasm_mode(&mut self, v: bool) {
+        self.wasm_mode = v;
+    }
+
+    pub fn get_output(self) -> Vec<String> {
+        self.output
+    }
+
     pub fn interpret(&mut self, source: &str) -> InterpretResult {
         let mut chunk = Chunk::new();
         let mut compiler = Compiler::new(source, &mut chunk);
 
-        if !compiler.compile() {
-            return Err(crate::InterpretError::CompileError);
+        if self.wasm_mode {
+            compiler.set_wasm_mode(true);
         }
-
+        
+        if !compiler.compile() {
+            if let Some(errors) = compiler.get_errors() {
+                let received_err = errors.join("\n");
+                return Err(crate::InterpretError::CompileError(
+                    "Compilation Errors:\n".to_string() + &received_err,
+                ));
+            }
+            return Err(crate::InterpretError::CompileError(
+                String::from("Compilation Erros:\n")
+            ));
+        }
+        
         self.chunk = Some(chunk);
         self.run()
     }
@@ -85,13 +109,19 @@ impl VM {
                             let is_equal = a == b;
                             self.push_value(ValueType::Bool(is_equal));
                         }
-                        _ => return Err(InterpretError::RuntimeError),
+                        _ => return Err(InterpretError::RuntimeError(
+                            "Not enough value to compare".to_string()
+                        )),
                     },
                     OpCode::GREATER => self.binary_cmp(|a, b| a > b)?,
                     OpCode::LESS => self.binary_cmp(|a, b| a < b)?,
                     OpCode::PRINT => {
                         if let Some(print_value) = self.pop_value() {
-                            println!("{}", print_value);
+                            if self.wasm_mode {
+                                self.output.push(print_value.to_string());
+                            } else {
+                                println!("{}", print_value);
+                            }
                         }
                     }
                     OpCode::POP => {
@@ -117,7 +147,11 @@ impl VM {
                         if let Some(value) = self.globals.get(&constant_name) {
                             self.push_value(value.to_owned());
                         } else {
-                            return Err(InterpretError::RuntimeError);
+                            return Err(
+                                InterpretError::RuntimeError(
+                                    format!("Undefined variable `{}`", constant_name)
+                                )
+                            );
                         }
                     }
                     OpCode::SetGlobal => {
@@ -128,7 +162,9 @@ impl VM {
                                 Some(value) => {
                                     *value = value_to_update;
                                 }
-                                None => return Err(InterpretError::RuntimeError),
+                                None => return Err(InterpretError::RuntimeError(
+                                    format!("Undefined variable `{}`", constant_name)
+                                )),
                             }
                         }
                     }
@@ -209,10 +245,12 @@ impl VM {
                     self.push_value(v);
                     return Ok(());
                 }
-                Err(e) => Err(e)?,
+                Err(e) => Err(e)?
             }
         }
-        Err(InterpretError::RuntimeError)
+        Err(InterpretError::RuntimeError(
+            "Not enough operand to perfom operation".to_string()
+        ))
     }
 
     fn binary_cmp<F>(&mut self, op: F) -> InterpretResult
@@ -224,7 +262,9 @@ impl VM {
             self.push_value(ValueType::Bool(cmp_result));
             return Ok(());
         }
-        Err(InterpretError::RuntimeError)
+        Err(InterpretError::RuntimeError(
+            "Not enough operand to perfom comparision".to_string()
+        ))
     }
 
     fn negate_op(&mut self) -> InterpretResult {
@@ -234,10 +274,17 @@ impl VM {
                     *num = -*num;
                     return Ok(());
                 }
-                _ => return Err(InterpretError::RuntimeError),
+                _ => {
+
+                    return Err(InterpretError::RuntimeError(
+                        "Operand must be a number.".to_string()
+                    ))
+                },
             }
         }
-        Err(InterpretError::RuntimeError)
+        Err(InterpretError::RuntimeError(
+            "Operand does not exist to negate".to_string()
+        ))
     }
 
     fn peek(&self, distance: usize) -> Option<&ValueType> {

@@ -10,13 +10,17 @@ pub mod vm;
 
 pub type InterpretResult = Result<(), InterpretError>;
 pub enum InterpretError {
-    CompileError,
-    RuntimeError,
+    CompileError(String),
+    RuntimeError(String),
 }
+
+
 
 use scanner::Scanner;
 use token::Token;
+use vm::VM;
 use wasm_bindgen::prelude::*;
+use web_sys;
 
 #[wasm_bindgen]
 #[derive(Clone, Debug, PartialEq)]
@@ -70,9 +74,69 @@ pub fn tokenize(source: &str) -> Vec<WasmToken> {
     tokens
 }
 
+#[wasm_bindgen]
+pub fn compile_and_run(src: &str) -> String {
+    let mut virtual_machine = VM::new();
+    virtual_machine.set_wasm_mode(true);
+
+    let start_time = web_sys::window()
+        .and_then(|win| win.performance())
+        .map(|performance| performance.now())
+        .unwrap_or(0.0);
+
+    match virtual_machine.interpret(src) {
+        Ok(_) => {
+            let elapsed_time = web_sys::window()
+                .and_then(|win| win.performance())
+                .map(|performance| performance.now() - start_time)
+                .unwrap_or(0.0);
+
+            let outputs = virtual_machine.get_output().join("\n");
+
+            let resp = format!(r#"
+Compilation and Execution Completed Successfully!!!
+Took {:.2}ms
+----------------------------------------------------
+{}"#,
+                elapsed_time, outputs
+            );
+
+            resp
+        },
+        Err(e) => {
+            match e {
+                InterpretError::CompileError(c_err_str) => c_err_str,
+                InterpretError::RuntimeError(r_err_str) => {
+                    let mut outputs: String = virtual_machine.get_output().join("\n");
+
+                    if outputs.is_empty() {
+                        return r_err_str;
+                    }
+                    outputs.push_str("\nRuntime Error Occured:\n\t");
+                    outputs.push_str(&r_err_str);
+                    outputs
+                }
+            }
+        }
+    }
+}
+
 #[cfg(test)]
-mod tests {
-    use super::*;
+mod vm_tests {
+    use super::compile_and_run;
+
+    #[test]
+    fn compile_and_run_simple_print() {
+        let code = r#"print "Hello World!";"#;
+        let result = compile_and_run(&code);
+
+        assert_eq!(&result, "Compilation and Execution Completed Successfully\nTook 0.00s\n\nHello World!");
+    }
+}
+
+#[cfg(test)]
+mod token_tests {
+    use super::{tokenize, WasmToken};
 
     #[test]
     fn tokenize_signle_char() {
