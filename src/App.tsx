@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import Editor, { EditorHandle } from "./components/editor/Editor"
 import ToolBar from "./components/ToolBar"
 import { useTokenize } from "./hooks/useTokenize"
+import Modal from "./components/modal/Modal";
 
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
 
   const [isOutputVisible, setIsOutputVisible] = useState(false);
   const [outputContent, setOutputContent] = useState<string>("");
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const handleCodeRun = () => {
     if (!editorRunRef.current || !compileRunFn) {
@@ -34,9 +36,14 @@ function App() {
     setIsOutputVisible(true);
   };
 
+  const handleModalOpen = () => {
+    console.log("Modal is: ", showModal);
+    setShowModal((prev) => !prev)
+  }
+
   return (
     <div className="h-screen flex flex-col bg-neutral-900 text-white font-mono">
-      <ToolBar onRun={handleCodeRun} onLoad={handleLoadExample} />
+      <ToolBar onRun={handleCodeRun} onLoad={handleLoadExample} showModal={handleModalOpen} />
       {!tokenizeState || !tokenizeFn 
         ? <div>Loading WASM...</div>
         : <Editor 
@@ -48,6 +55,7 @@ function App() {
             onConsoleClick={handleConsoleClick}
           />
       }
+      {showModal && <Modal onClose={handleModalOpen}/>}
     </div>
   )
 }
