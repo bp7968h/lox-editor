@@ -57,7 +57,9 @@ impl TryFrom<u8> for OpCode {
             21 => Ok(OpCode::JumpIfFalse),
             22 => Ok(OpCode::JUMP),
             23 => Ok(OpCode::LOOP),
-            _ => Err(InterpretError::CompileError(String::from("Invalid OpCode Number"))),
+            _ => Err(InterpretError::CompileError(String::from(
+                "Invalid OpCode Number",
+            ))),
         }
     }
 }

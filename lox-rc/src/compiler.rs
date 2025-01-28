@@ -19,7 +19,7 @@ pub struct Compiler<'scanner, 'chunk> {
     panic_mode: bool,
     debug: bool,
     errors: Vec<String>,
-    wasm_mode: bool
+    wasm_mode: bool,
 }
 
 impl<'scanner, 'chunk> Compiler<'scanner, 'chunk> {
@@ -255,8 +255,10 @@ impl<'scanner, 'chunk> Compiler<'scanner, 'chunk> {
             // println!("{:?}", scanned_token);
 
             match scanned_token.token_type {
-                TokenType::WHITESPACE | TokenType::NEWLINE |
-                TokenType::COMMENT | TokenType::TAB => continue,
+                TokenType::WHITESPACE
+                | TokenType::NEWLINE
+                | TokenType::COMMENT
+                | TokenType::TAB => continue,
                 _ => (),
             }
 

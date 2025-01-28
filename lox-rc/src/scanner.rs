@@ -20,7 +20,10 @@ impl<'a> Scanner<'a> {
     }
 
     pub fn state(&self) -> String {
-        format!("line: {} start: {} current: {}", self.line, self.start, self.current)
+        format!(
+            "line: {} start: {} current: {}",
+            self.line, self.start, self.current
+        )
     }
 
     pub fn get_slice_constant(&self, start: usize, end: usize) -> Option<f64> {
@@ -37,7 +40,7 @@ impl<'a> Scanner<'a> {
 
     pub fn scan_token(&mut self) -> Token {
         self.start = self.current;
-        
+
         if let Some(t) = self.skip_whitespace() {
             return t;
         }
@@ -100,61 +103,51 @@ impl<'a> Scanner<'a> {
     }
 
     fn skip_whitespace(&mut self) -> Option<Token> {
-        loop {
-            let character = self.peek();
-            match character {
-                ' ' | '\r' => {
-                    self.advance();
-                    return Some(
-                        Token { 
-                            token_type: TokenType::WHITESPACE, 
-                            lexeme: character.to_string(), 
-                            line: self.line 
-                        }
-                    )
-                },
-                '\t' => {
-                    self.advance();
-                    return Some(
-                        Token { 
-                            token_type: TokenType::TAB, 
-                            lexeme: character.to_string(), 
-                            line: self.line 
-                        }
-                    )
-                },
-                '\n' => {
-                    self.line += 1;
-                    self.advance();
-                    return Some(
-                        Token { 
-                            token_type: TokenType::NEWLINE, 
-                            lexeme: character.to_string(), 
-                            line: self.line 
-                        }
-                    )
-                }
-                '/' => {
-                    if self.peek_next() == '/' {
-                        while self.peek() != '\n' && !self.is_at_end() {
-                            self.advance();
-                        }
-                        if let Some(comment_byte) = self.source.get(self.start..self.current) {
-                            if let Ok(comment_string) = std::str::from_utf8(comment_byte) {
-                                return Some(
-                                    Token { 
-                                        token_type: TokenType::COMMENT, 
-                                        lexeme: comment_string.to_string(), 
-                                        line: self.line 
-                                    }
-                                )
-                            }
+        let character = self.peek();
+        match character {
+            ' ' | '\r' => {
+                self.advance();
+                Some(Token {
+                    token_type: TokenType::WHITESPACE,
+                    lexeme: character.to_string(),
+                    line: self.line,
+                })
+            }
+            '\t' => {
+                self.advance();
+                Some(Token {
+                    token_type: TokenType::TAB,
+                    lexeme: character.to_string(),
+                    line: self.line,
+                })
+            }
+            '\n' => {
+                self.line += 1;
+                self.advance();
+                Some(Token {
+                    token_type: TokenType::NEWLINE,
+                    lexeme: character.to_string(),
+                    line: self.line,
+                })
+            }
+            '/' => {
+                if self.peek_next() == '/' {
+                    while self.peek() != '\n' && !self.is_at_end() {
+                        self.advance();
+                    }
+                    if let Some(comment_byte) = self.source.get(self.start..self.current) {
+                        if let Ok(comment_string) = std::str::from_utf8(comment_byte) {
+                            return Some(Token {
+                                token_type: TokenType::COMMENT,
+                                lexeme: comment_string.to_string(),
+                                line: self.line,
+                            });
                         }
                     }
-                    return None;
                 }
-                _ => return None,
+                None
             }
+            _ => None,
         }
     }
 

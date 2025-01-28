@@ -53,7 +53,7 @@ impl VM {
         if self.wasm_mode {
             compiler.set_wasm_mode(true);
         }
-        
+
         if !compiler.compile() {
             if let Some(errors) = compiler.get_errors() {
                 let received_err = errors.join("\n");
@@ -61,11 +61,11 @@ impl VM {
                     "Compilation Errors:\n".to_string() + &received_err,
                 ));
             }
-            return Err(crate::InterpretError::CompileError(
-                String::from("Compilation Erros:\n")
-            ));
+            return Err(crate::InterpretError::CompileError(String::from(
+                "Compilation Erros:\n",
+            )));
         }
-        
+
         self.chunk = Some(chunk);
         self.run()
     }
@@ -109,9 +109,11 @@ impl VM {
                             let is_equal = a == b;
                             self.push_value(ValueType::Bool(is_equal));
                         }
-                        _ => return Err(InterpretError::RuntimeError(
-                            "Not enough value to compare".to_string()
-                        )),
+                        _ => {
+                            return Err(InterpretError::RuntimeError(
+                                "Not enough value to compare".to_string(),
+                            ))
+                        }
                     },
                     OpCode::GREATER => self.binary_cmp(|a, b| a > b)?,
                     OpCode::LESS => self.binary_cmp(|a, b| a < b)?,
@@ -147,11 +149,10 @@ impl VM {
                         if let Some(value) = self.globals.get(&constant_name) {
                             self.push_value(value.to_owned());
                         } else {
-                            return Err(
-                                InterpretError::RuntimeError(
-                                    format!("Undefined variable `{}`", constant_name)
-                                )
-                            );
+                            return Err(InterpretError::RuntimeError(format!(
+                                "Undefined variable `{}`",
+                                constant_name
+                            )));
                         }
                     }
                     OpCode::SetGlobal => {
@@ -162,9 +163,12 @@ impl VM {
                                 Some(value) => {
                                     *value = value_to_update;
                                 }
-                                None => return Err(InterpretError::RuntimeError(
-                                    format!("Undefined variable `{}`", constant_name)
-                                )),
+                                None => {
+                                    return Err(InterpretError::RuntimeError(format!(
+                                        "Undefined variable `{}`",
+                                        constant_name
+                                    )))
+                                }
                             }
                         }
                     }
@@ -245,11 +249,11 @@ impl VM {
                     self.push_value(v);
                     return Ok(());
                 }
-                Err(e) => Err(e)?
+                Err(e) => Err(e)?,
             }
         }
         Err(InterpretError::RuntimeError(
-            "Not enough operand to perfom operation".to_string()
+            "Not enough operand to perfom operation".to_string(),
         ))
     }
 
@@ -263,7 +267,7 @@ impl VM {
             return Ok(());
         }
         Err(InterpretError::RuntimeError(
-            "Not enough operand to perfom comparision".to_string()
+            "Not enough operand to perfom comparision".to_string(),
         ))
     }
 
@@ -275,15 +279,14 @@ impl VM {
                     return Ok(());
                 }
                 _ => {
-
                     return Err(InterpretError::RuntimeError(
-                        "Operand must be a number.".to_string()
+                        "Operand must be a number.".to_string(),
                     ))
-                },
+                }
             }
         }
         Err(InterpretError::RuntimeError(
-            "Operand does not exist to negate".to_string()
+            "Operand does not exist to negate".to_string(),
         ))
     }
 

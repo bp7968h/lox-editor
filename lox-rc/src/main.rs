@@ -20,11 +20,11 @@ fn main() {
                         InterpretError::CompileError(s) => {
                             eprintln!("{}", s);
                             process::exit(65)
-                        },
+                        }
                         InterpretError::RuntimeError(s) => {
                             eprintln!("{}", s);
                             process::exit(70)
-                        },
+                        }
                     },
                 }
             }

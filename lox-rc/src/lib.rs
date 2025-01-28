@@ -14,13 +14,10 @@ pub enum InterpretError {
     RuntimeError(String),
 }
 
-
-
 use scanner::Scanner;
 use token::Token;
 use vm::VM;
 use wasm_bindgen::prelude::*;
-use web_sys;
 
 #[wasm_bindgen]
 #[derive(Clone, Debug, PartialEq)]
@@ -93,7 +90,8 @@ pub fn compile_and_run(src: &str) -> String {
 
             let outputs = virtual_machine.get_output().join("\n");
 
-            let resp = format!(r#"
+            let resp = format!(
+                r#"
 Compilation and Execution Completed Successfully!!!
 Took {:.2}ms
 ----------------------------------------------------
@@ -102,22 +100,20 @@ Took {:.2}ms
             );
 
             resp
-        },
-        Err(e) => {
-            match e {
-                InterpretError::CompileError(c_err_str) => c_err_str,
-                InterpretError::RuntimeError(r_err_str) => {
-                    let mut outputs: String = virtual_machine.get_output().join("\n");
-
-                    if outputs.is_empty() {
-                        return r_err_str;
-                    }
-                    outputs.push_str("\nRuntime Error Occured:\n\t");
-                    outputs.push_str(&r_err_str);
-                    outputs
-                }
-            }
         }
+        Err(e) => match e {
+            InterpretError::CompileError(c_err_str) => c_err_str,
+            InterpretError::RuntimeError(r_err_str) => {
+                let mut outputs: String = virtual_machine.get_output().join("\n");
+
+                if outputs.is_empty() {
+                    return r_err_str;
+                }
+                outputs.push_str("\nRuntime Error Occured:\n\t");
+                outputs.push_str(&r_err_str);
+                outputs
+            }
+        },
     }
 }
 
@@ -130,7 +126,10 @@ mod vm_tests {
         let code = r#"print "Hello World!";"#;
         let result = compile_and_run(&code);
 
-        assert_eq!(&result, "Compilation and Execution Completed Successfully\nTook 0.00s\n\nHello World!");
+        assert_eq!(
+            &result,
+            "Compilation and Execution Completed Successfully\nTook 0.00s\n\nHello World!"
+        );
     }
 }
 
