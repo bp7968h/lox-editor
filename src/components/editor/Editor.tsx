@@ -3,6 +3,7 @@ import LineNumber from "./LineNumber";
 import LineCode from "./LineCode";
 import useEditorState from "../../hooks/useEditorState";
 import { WasmToken } from "lox_rc";
+import Bar from "./Bar";
 
 type EditorProps = {
     tokenizer: (source: string) => WasmToken[];
@@ -10,7 +11,7 @@ type EditorProps = {
 
 export interface EditorHandle {
     getCode: () => string;
-    setCode: (newCode: string) => void;
+    loadCode: (newCode: string) => void;
 }
 
 const Editor = forwardRef<EditorHandle, EditorProps>((props, ref) => {
@@ -37,7 +38,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>((props, ref) => {
         getCode() {
           return lines.map(line => line.code).join("\n");
         },
-        setCode(exampleCode: string) {
+        loadCode(exampleCode: string) {
             const rawLines = exampleCode.split("\n");
             const newLines = rawLines.map((text, idx) => {
                 const tokens = tokenizer(text);
@@ -50,23 +51,26 @@ const Editor = forwardRef<EditorHandle, EditorProps>((props, ref) => {
 
             setLines(newLines);
             const lastLineIndex = newLines.length;
+            const lastLineCol = newLines[lastLineIndex - 1].code.length
+            console.log('loaded code ', 'length: ', lastLineIndex, 'Col: ', lastLineCol);
             setCursorPosition({
-                line: lastLineIndex + 1,
-                column: 0,
+                line: lastLineIndex,
+                column: lastLineCol,
             });
         }
     }));
 
     return (
         <div 
-            className={`my-2 mx-2 p-1 bg-code font-code_mono grow flex rounded-md ${isActive ? "border" : ""}`}
+            className={`flex-1 flex flex-col overflow-y-auto my-2 mx-2 bg-code font-code_mono h-screen rounded-md ${isActive ? "border" : ""}`}
             onClick={() => setIsActive(true)}
         >
+            <Bar />
             <div
                 ref={editorRef}
                 tabIndex={0}
                 onKeyDown={handleKeyDown}
-                className="bg-inherit text-white grow px-2 py-0 focus:outline-none"
+                className="h-full bg-inherit text-white px-2 py-0 focus:outline-none text-sm sm:text-md md:text-lg"
             >
                 {lines.map((line) => {
                     return (
@@ -88,6 +92,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>((props, ref) => {
                     )
                 })}
             </div>
+            {/* <div>Something</div> */}
         </div>
     )
 });

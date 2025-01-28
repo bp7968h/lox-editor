@@ -20,11 +20,11 @@ function App() {
     if (!editorRunRef.current) {
       return;
     }
-    editorRunRef.current.setCode(exampleCode);
+    editorRunRef.current.loadCode(exampleCode);
   }
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white flex flex-col font-mono">
+    <div className="h-screen flex flex-col bg-neutral-900 text-white font-mono">
       <ToolBar onRun={handleCodeRun} onLoad={handleLoadExample} />
       {!tokenizeState || !tokenizeFn 
         ? <div>Loading WASM...</div>

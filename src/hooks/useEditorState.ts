@@ -20,11 +20,9 @@ const updateLineContent = (
     tokenizer: (source: string) => WasmToken[]
   ): Line[] => {
     const newTokens = tokenizer(newCode);
-    // newTokens.forEach((t) => {
-    //     console.log(t.token_type);
-    //     console.log(t.lexeme);
-    //     console.log(t.line);    
-    // })
+    newTokens.forEach((t) => {
+        console.log(t.token_type, t.lexeme, t.line);
+    })
     return lines.map((l) =>
       l.id === lineId ? { ...l, code: newCode, tokens: newTokens } : l
     );

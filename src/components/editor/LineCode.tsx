@@ -12,7 +12,9 @@ type LineCodeProps = {
 
 const ElementFromToken = (token: WasmToken, index: number): ReactNode | null => {
   switch(token.token_type.toLowerCase()) {
+    case 'tab':
     case 'whitespace': {
+      console.log("whitespace");
       return (
       <span key={`whitespace-${index}`}>
         {token.lexeme}
@@ -21,6 +23,13 @@ const ElementFromToken = (token: WasmToken, index: number): ReactNode | null => 
     }
     case 'newline':
       return null;
+    case 'comment': {
+      return (
+        <span key={`${token.lexeme}-${index}`} className="text-code_comment">
+          {token.lexeme}
+        </span>
+      );
+    }
     case 'identifier': {
       return (
         <span key={`${token.lexeme}-${index}`} className="text-code_blue">
@@ -71,7 +80,9 @@ const ElementFromToken = (token: WasmToken, index: number): ReactNode | null => 
 }
 
 const LineCode: React.FC<LineCodeProps> = ({ code, tokens, cursorCol, status }) => {
+
     if (cursorCol === undefined) {
+        console.log(tokens);
         return (
           <div>
             {tokens?.map((token, index) => ElementFromToken(token, index) )}
