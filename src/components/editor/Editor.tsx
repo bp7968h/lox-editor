@@ -4,9 +4,14 @@ import LineCode from "./LineCode";
 import useEditorState from "../../hooks/useEditorState";
 import { WasmToken } from "lox_rc";
 import Bar from "./Bar";
+import OutputPanel from "./OutputPanel";
 
 type EditorProps = {
     tokenizer: (source: string) => WasmToken[];
+    isOutputVisible: boolean;
+    outputContent: string;
+    onCloseOutput: () => void;
+    onConsoleClick: () => void;
 };
 
 export interface EditorHandle {
@@ -15,8 +20,8 @@ export interface EditorHandle {
 }
 
 const Editor = forwardRef<EditorHandle, EditorProps>((props, ref) => {
-    const { tokenizer } = props;
-
+    const { tokenizer, isOutputVisible, outputContent, onCloseOutput, onConsoleClick } = props;
+    
     const { lines, cursorPosition, handleKeyDown, setLines, setCursorPosition } = useEditorState(tokenizer);
     const [isActive, setIsActive] = useState(false);
     const editorRef = useRef<HTMLDivElement>(null);
@@ -33,6 +38,15 @@ const Editor = forwardRef<EditorHandle, EditorProps>((props, ref) => {
           document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    const handleCopy = async () => {
+        try {
+          const code = lines.map((line) => line.code).join("\n");
+          await navigator.clipboard.writeText(code);
+        } catch (error) {
+          console.error("Failed to copy text: ", error);
+        }
+    };
 
     useImperativeHandle(ref, () => ({
         getCode() {
@@ -62,10 +76,10 @@ const Editor = forwardRef<EditorHandle, EditorProps>((props, ref) => {
 
     return (
         <div 
-            className={`flex-1 flex flex-col overflow-y-auto my-2 mx-2 bg-code font-code_mono h-screen rounded-md ${isActive ? "border" : ""}`}
+            className={`relative flex-1 flex flex-col overflow-y-auto my-2 mx-2 bg-code font-code_mono h-screen rounded-md ${isActive ? "border" : ""}`}
             onClick={() => setIsActive(true)}
         >
-            <Bar />
+            <Bar onConsoleClick={onConsoleClick} isOutputVisible={isOutputVisible} onCopy={handleCopy} />
             <div
                 ref={editorRef}
                 tabIndex={0}
@@ -92,7 +106,9 @@ const Editor = forwardRef<EditorHandle, EditorProps>((props, ref) => {
                     )
                 })}
             </div>
-            {/* <div>Something</div> */}
+            <OutputPanel isVisible={isOutputVisible} onClose={onCloseOutput} >
+                {outputContent ? outputContent : undefined}
+            </OutputPanel>
         </div>
     )
 });
