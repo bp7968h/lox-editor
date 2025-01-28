@@ -76,8 +76,8 @@ mod tests {
 
     #[test]
     fn tokenize_signle_char() {
-        let charter: &str = "c";
-        let res = tokenize(charter);
+        let code: &str = "c";
+        let res = tokenize(code);
 
         assert_eq!(res.len(), 1);
         assert_eq!(
@@ -88,5 +88,85 @@ mod tests {
                 line: 1
             }
         )
+    }
+
+    #[test]
+    fn tokenize_signle_slash() {
+        let code: &str = "/";
+        let res = tokenize(code);
+
+        assert_eq!(res.len(), 1);
+        assert_eq!(
+            res[0],
+            WasmToken {
+                token_type: "SLASH".to_string(),
+                lexeme: "/".to_string(),
+                line: 1
+            }
+        )
+    }
+
+    #[test]
+    fn tokenize_print_whitespace_identifier() {
+        let code: &str = "print a";
+        let res = tokenize(code);
+
+        assert_eq!(res.len(), 3);
+        assert_eq!(
+            res[0],
+            WasmToken {
+                token_type: "PRINT".to_string(),
+                lexeme: "print".to_string(),
+                line: 1
+            }
+        );
+        assert_eq!(
+            res[1],
+            WasmToken {
+                token_type: "WHITESPACE".to_string(),
+                lexeme: " ".to_string(),
+                line: 1
+            }
+        );
+        assert_eq!(
+            res[2],
+            WasmToken {
+                token_type: "IDENTIFIER".to_string(),
+                lexeme: "a".to_string(),
+                line: 1
+            }
+        );
+    }
+
+    #[test]
+    fn tokenize_comment() {
+        let code: &str = "a //this is comment";
+        let res = tokenize(code);
+
+        assert_eq!(res.len(), 3);
+        assert_eq!(
+            res[2],
+            WasmToken {
+                token_type: "COMMENT".to_string(),
+                lexeme: "//this is comment".to_string(),
+                line: 1
+            }
+        );
+    }
+
+    #[test]
+    fn tokenize_print_whitespace_identifier_comment() {
+        let code: &str = "print a; //this is comment";
+        let res = tokenize(code);
+
+        assert_eq!(res.len(), 6);
+        assert_eq!(
+            res[5],
+            WasmToken {
+                token_type: "COMMENT".to_string(),
+                lexeme: "//this is comment".to_string(),
+                line: 1
+            }
+        );
     }
 }

@@ -234,8 +234,11 @@ impl<'scanner, 'chunk> Compiler<'scanner, 'chunk> {
 
         loop {
             let scanned_token = self.scanner.scan_token();
-            if scanned_token.token_type == TokenType::WHITESPACE || scanned_token.token_type == TokenType::NEWLINE {
-                continue;
+
+            match scanned_token.token_type {
+                TokenType::WHITESPACE | TokenType::NEWLINE |
+                TokenType::COMMENT | TokenType::TAB => continue,
+                _ => (),
             }
 
             match scanned_token.token_type {

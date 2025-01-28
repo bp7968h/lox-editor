@@ -70,6 +70,8 @@ pub enum TokenType {
 
     NEWLINE,
     WHITESPACE,
+    COMMENT,
+    TAB,
 
     ERROR,
     EOF,

@@ -19,6 +19,10 @@ impl<'a> Scanner<'a> {
         }
     }
 
+    pub fn state(&self) -> String {
+        format!("line: {} start: {} current: {}", self.line, self.start, self.current)
+    }
+
     pub fn get_slice_constant(&self, start: usize, end: usize) -> Option<f64> {
         if end <= self.source.len() {
             if let Ok(str_value) = std::str::from_utf8(&self.source[start..=end]) {
@@ -32,11 +36,11 @@ impl<'a> Scanner<'a> {
     }
 
     pub fn scan_token(&mut self) -> Token {
-        self.skip_whitespace();
+        self.start = self.current;
+        
         if let Some(t) = self.skip_whitespace() {
             return t;
         }
-        self.start = self.current;
 
         if self.is_at_end() {
             return self.make_token(TokenType::EOF);
@@ -99,7 +103,7 @@ impl<'a> Scanner<'a> {
         loop {
             let character = self.peek();
             match character {
-                ' ' | '\r' | '\t' => {
+                ' ' | '\r' => {
                     self.advance();
                     return Some(
                         Token { 
@@ -108,7 +112,17 @@ impl<'a> Scanner<'a> {
                             line: self.line 
                         }
                     )
-                }
+                },
+                '\t' => {
+                    self.advance();
+                    return Some(
+                        Token { 
+                            token_type: TokenType::TAB, 
+                            lexeme: character.to_string(), 
+                            line: self.line 
+                        }
+                    )
+                },
                 '\n' => {
                     self.line += 1;
                     self.advance();
@@ -124,6 +138,17 @@ impl<'a> Scanner<'a> {
                     if self.peek_next() == '/' {
                         while self.peek() != '\n' && !self.is_at_end() {
                             self.advance();
+                        }
+                        if let Some(comment_byte) = self.source.get(self.start..self.current) {
+                            if let Ok(comment_string) = std::str::from_utf8(comment_byte) {
+                                return Some(
+                                    Token { 
+                                        token_type: TokenType::COMMENT, 
+                                        lexeme: comment_string.to_string(), 
+                                        line: self.line 
+                                    }
+                                )
+                            }
                         }
                     }
                     return None;
@@ -241,7 +266,7 @@ impl<'a> Scanner<'a> {
     }
 
     fn peek_next(&self) -> char {
-        if self.is_at_end() {
+        if self.is_at_end_next() {
             return '\0';
         }
         self.source[self.current + 1].into()
@@ -282,5 +307,9 @@ impl<'a> Scanner<'a> {
 
     fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
+    }
+
+    fn is_at_end_next(&self) -> bool {
+        self.current + 1 >= self.source.len()
     }
 }
