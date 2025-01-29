@@ -23,7 +23,7 @@ const DropDown: React.FC<{loadExample: (src: string) => void}> = ({loadExample})
         logical: `// Demonstrates logical operators\nvar a = true;\nvar b = false;\n\nif (a or b and true) {\n\tprint "true and false";\n} `,
         block_var_string: `// Demonstrates block scoping,\n// variable declearation,\n// string concatination\n{\n\tvar a = "outer";\n\t{\n\t\tvar a = "inner";\n\t\ta = a + " " + "hello";\n\t\tprint a;\n\t}\n\tprint a;\n}`,
         conditional: `// Demonstrates if, and else.\n// No support for else-if\nvar number = -10;\n\nif (number >= 0) {\n\tprint "number is positive";\n} else {\n\tprint "number is negative";\n}`,
-        loops: `// Using a 'while' loop to\n// calculate the sum of numbers 1 to 5\nvar sum = 0;\nvar i = 1;\nwhile (i <= 5) {\n\tsum = sum + i;\n\ti = i + 1;\n}\n\n// Print the result of the summation\nprint "Sum from 1-5 is: " + sum;\n\nprint ""; // Blank line for clarity\n\n// Using a 'for' loop to print\n// multiplication table (e.g., for 3)\nprint "Multiplication table for 3:";\nfor (var j = 1; j <= 10; j = j + 1) {\n\tprint "3 * " + j + " = " + (3 * j);\n}`,
+        loops: `// Demonstrates loops ;)\n\n// Demonstrating a while loop\nvar i = 0;\nprint "While loop:";\nwhile (i < 5) {\n\tprint i;\n\ti = i + 1;\n}\n\nprint "-------------";\n\n// Demonstrating a for loop\nprint "For loop:";\nfor (; i < 10; i = i + 1) {\n\tprint i;\n}`,
         // fibonacci: `fun fib(n) {\n\tif (n < 2) return n;\n\treturn fib(n - 1) + fib(n - 2);\n}\nprint fib(10); // 55`,
       };
 
